@@ -7,6 +7,7 @@ if (!databaseUrl) {
 }
 // PrismaMariaDb lager selv en connection pool basert på URL/konfig
 const adapter = new PrismaMariaDb(databaseUrl);
+// PrismaClient støtter adapter i runtime; type-cast for å unngå TS-klaging.
 export const prisma = new PrismaClient({ adapter });
 export async function disconnectDatabase() {
     await prisma.$disconnect();

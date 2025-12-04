@@ -12,6 +12,31 @@ const jwtSecretValue = jwtSecret;
 await app.register(cors, {
     origin: true,
 });
+function simulateAiAnalysis(title, content) {
+    const baseScore = 60 + Math.floor(Math.random() * 36); // 60-95
+    const strengthsPool = [
+        "Klar problemformulering",
+        "Konkrete brukere",
+        "Mulig teknisk løsning",
+        "Skalerbar idé",
+        "Enkel å teste",
+    ];
+    const weaknessesPool = [
+        "Uavklart målgruppe",
+        "Manglende datagrunnlag",
+        "Behov for mer validering",
+        "Potensielt høy kost",
+        "Utydelig differensiering",
+    ];
+    const strengths = strengthsPool.sort(() => 0.5 - Math.random()).slice(0, 2);
+    const weaknesses = weaknessesPool.sort(() => 0.5 - Math.random()).slice(0, 2);
+    return {
+        score: baseScore,
+        strengths,
+        weaknesses,
+        summary: `Foreløpig vurdering av "${title}": lovende, men krever videre utforskning.`,
+    };
+}
 function issueToken(payload) {
     return jwt.sign(payload, jwtSecretValue, { expiresIn: "7d" });
 }
@@ -139,15 +164,45 @@ app.post("/api/ideas", async (request, reply) => {
     if (!userExists) {
         return reply.code(404).send({ message: "Fant ikke bruker." });
     }
+    const analysis = simulateAiAnalysis(title, content);
     const idea = await prisma.idea.create({
-        data: { userId: user.id, title, content },
+        data: { userId: user.id, title, content, aiReply: JSON.stringify(analysis) },
     });
     return reply.code(201).send({
         id: idea.id,
         title: idea.title,
         content: idea.content,
-        aiReply: idea.aiReply,
+        analysis,
     });
+});
+app.get("/api/ideas", async (request, reply) => {
+    const user = await requireUser(request, reply);
+    if (!user) {
+        return;
+    }
+    const ideas = await prisma.idea.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+    });
+    const result = ideas.map((idea) => {
+        let parsed;
+        if (idea.aiReply) {
+            try {
+                parsed = JSON.parse(idea.aiReply);
+            }
+            catch (err) {
+                request.log.warn({ err }, "Kunne ikke parse aiReply");
+            }
+        }
+        return {
+            id: idea.id,
+            title: idea.title,
+            content: idea.content,
+            createdAt: idea.createdAt,
+            analysis: parsed,
+        };
+    });
+    return reply.send(result);
 });
 app.addHook("onClose", async () => {
     await disconnectDatabase();

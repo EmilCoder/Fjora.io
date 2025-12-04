@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
@@ -21,7 +22,7 @@ model Idea {
   id        Int      @id @default(autoincrement())
   title     String
   content   String
-  aiReply   String?
+  aiReply   String?  @db.Text
   createdAt DateTime @default(now())
 
   userId Int

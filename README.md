@@ -42,7 +42,8 @@ Repository for ifjora webløsning
 - `POST /api/login` — body `{ "email": "...", "password": "..." }`, verifiserer bruker. Svar inkluderer JWT.
 - `GET /api/me` — krever `Authorization: Bearer <token>`, henter egen profil.
 - `PUT /api/me` — krever `Authorization: Bearer <token>`, oppdaterer egen e-post og/eller passord.
-- `POST /api/ideas` — krever `Authorization: Bearer <token>`, body `{ "title": "...", "content": "..." }`, lagrer idé knyttet til innlogget bruker (AI-svarfelt finnes, men fylles ikke ennå).
+- `POST /api/ideas` — krever `Authorization: Bearer <token>`, body `{ "title": "...", "content": "..." }`, lagrer idé knyttet til innlogget bruker og returnerer en midlertidig simulert AI-vurdering (`analysis`).
+- `GET /api/ideas` — krever `Authorization: Bearer <token>`, henter egne ideer inkl. lagret/parsede analyser.
 
 `GET /api/health` gir en enkel status.
 
