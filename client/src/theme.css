@@ -1,0 +1,326 @@
+/* ===========================
+   FJORA GLOBAL THEME
+   =========================== */
+
+/* 1. Design tokens (CSS-variabler) */
+:root {
+  /* Primærfarger (juster til dine Figma-verdier) */
+  --fj-color-primary-600: #5B21E6; /* hover / aktiv */
+  --fj-color-primary-500: #7C3AED; /* hovedlilla */
+  --fj-color-primary-400: #A855F7; /* outline / sekundær */
+  --fj-color-primary-100: #F3E8FF; /* lys lilla-bakgrunn */
+
+  /* Bakgrunn / overflater */
+  --fj-color-bg-page: #F5F3FF;    /* bakgrunn hele siden */
+  --fj-color-bg-elevated: #FFFFFF;/* cards / modaler */
+
+  --fj-color-border-subtle: #E5E7EB;
+  --fj-color-border-strong: #D1D5DB;
+
+  --fj-color-shadow: rgba(15, 23, 42, 0.12);
+
+  /* Tekst */
+  --fj-color-text-strong: #111827;     /* overskrifter */
+  --fj-color-text-body:   #1F2933;     /* vanlig tekst */
+  --fj-color-text-muted:  #6B7280;     /* hjelpetekst */
+  --fj-color-text-on-primary: #FFFFFF; /* tekst på lilla */
+
+  /* Status / score / risiko */
+  --fj-color-success: #22C55E;
+  --fj-color-warning: #FACC15;
+  --fj-color-danger:  #F97373;
+
+  --fj-color-success-soft: #DCFCE7;
+  --fj-color-warning-soft: #FEF7C3;
+  --fj-color-danger-soft:  #FEE2E2;
+
+  /* Gradients */
+  --fj-gradient-hero: linear-gradient(180deg, #F5F3FF 0%, #FFFFFF 60%);
+  --fj-gradient-cta:  linear-gradient(90deg, #7C3AED 0%, #A855F7 100%);
+
+  /* Typografi */
+  --fj-font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                    "Segoe UI", sans-serif;
+
+  --fj-font-size-display: 32px; /* hero */
+  --fj-font-size-h1:      24px; /* seksjonstitler */
+  --fj-font-size-h2:      20px; /* korttitler */
+  --fj-font-size-body:    16px; /* brødtekst */
+  --fj-font-size-small:   14px; /* hjelpetekst */
+  --fj-font-size-tag:     12px; /* badges */
+
+  --fj-line-height-tight:   1.15;
+  --fj-line-height-normal:  1.4;
+  --fj-line-height-relaxed: 1.6;
+
+  /* Spacing (8px-grid) */
+  --fj-space-0: 0;
+  --fj-space-1: 4px;
+  --fj-space-2: 8px;
+  --fj-space-3: 12px;
+  --fj-space-4: 16px;
+  --fj-space-5: 24px;
+  --fj-space-6: 32px;
+  --fj-space-7: 40px;
+  --fj-space-8: 48px;
+
+  /* Radius */
+  --fj-radius-card-lg: 24px;
+  --fj-radius-card-md: 16px;
+  --fj-radius-pill:    999px;
+  --fj-radius-input:   999px;
+
+  /* Shadow */
+  --fj-shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.12);
+}
+
+/* ===========================
+   2. Base / reset
+   =========================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--fj-font-family);
+  font-size: var(--fj-font-size-body);
+  line-height: var(--fj-line-height-relaxed);
+  color: var(--fj-color-text-body);
+  background: var(--fj-color-bg-page);
+}
+
+/* Fjerne default margin på headings/paragraphs, så du styrer med spacing-variabler */
+h1, h2, h3, h4, h5, h6,
+p {
+  margin: 0;
+}
+
+/* Links */
+a {
+  color: var(--fj-color-primary-500);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===========================
+   3. Typografi-hjelpere
+   =========================== */
+
+.fj-display {
+  font-size: var(--fj-font-size-display);
+  font-weight: 700;
+  line-height: var(--fj-line-height-tight);
+  color: var(--fj-color-text-strong);
+}
+
+.fj-h1 {
+  font-size: var(--fj-font-size-h1);
+  font-weight: 600;
+  line-height: var(--fj-line-height-normal);
+  color: var(--fj-color-text-strong);
+}
+
+.fj-h2 {
+  font-size: var(--fj-font-size-h2);
+  font-weight: 600;
+  line-height: var(--fj-line-height-normal);
+  color: var(--fj-color-text-strong);
+}
+
+.fj-body {
+  font-size: var(--fj-font-size-body);
+  line-height: var(--fj-line-height-relaxed);
+}
+
+.fj-text-muted {
+  font-size: var(--fj-font-size-small);
+  color: var(--fj-color-text-muted);
+}
+
+.fj-tag {
+  font-size: var(--fj-font-size-tag);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+/* ===========================
+   4. Layout helpers
+   =========================== */
+
+.fj-page {
+  min-height: 100vh;
+  background: var(--fj-gradient-hero);
+}
+
+.fj-section {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--fj-space-6) var(--fj-space-4);
+}
+
+/* ===========================
+   5. Komponenter
+   =========================== */
+
+/* Primær CTA-knapp */
+.fj-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--fj-space-5);
+  height: 48px;
+  border-radius: var(--fj-radius-pill);
+  border: none;
+  cursor: pointer;
+  font-size: var(--fj-font-size-body);
+  font-weight: 600;
+  color: var(--fj-color-text-on-primary);
+  background-image: var(--fj-gradient-cta);
+  box-shadow: var(--fj-shadow-soft);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+}
+
+.fj-btn-primary:hover {
+  filter: brightness(0.96);
+  transform: translateY(-1px);
+}
+
+.fj-btn-primary:active {
+  filter: brightness(0.9);
+  transform: translateY(0);
+}
+
+/* Sekundær outline-knapp (f.eks. "Logg inn") */
+.fj-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--fj-space-5);
+  height: 44px;
+  border-radius: var(--fj-radius-pill);
+  border: 2px solid var(--fj-color-primary-400);
+  background: transparent;
+  color: var(--fj-color-primary-500);
+  font-size: var(--fj-font-size-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.fj-btn-outline:hover {
+  background: var(--fj-color-primary-100);
+}
+
+/* Cards (innsikt, scorekort, styrker/svakheter, osv.) */
+.fj-card {
+  background: var(--fj-color-bg-elevated);
+  border-radius: var(--fj-radius-card-lg);
+  padding: var(--fj-space-5);
+  box-shadow: var(--fj-shadow-soft);
+}
+
+/* Mindre card (små infobokser) */
+.fj-card-sm {
+  background: var(--fj-color-bg-elevated);
+  border-radius: var(--fj-radius-card-md);
+  padding: var(--fj-space-4);
+  box-shadow: var(--fj-shadow-soft);
+}
+
+/* Inputs (runde felter i ide-skjema) */
+.fj-input {
+  width: 100%;
+  border-radius: var(--fj-radius-input);
+  border: 1px solid var(--fj-color-border-subtle);
+  background: #FFFFFF;
+  padding: 0 var(--fj-space-4);
+  height: 48px;
+  font-size: var(--fj-font-size-body);
+  font-family: var(--fj-font-family);
+  color: var(--fj-color-text-body);
+  outline: none;
+  transition: border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.fj-input:focus {
+  border-color: var(--fj-color-primary-400);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+/* Tekstområde */
+.fj-textarea {
+  width: 100%;
+  min-height: 140px;
+  border-radius: 20px;
+  border: 1px solid var(--fj-color-border-subtle);
+  background: #FFFFFF;
+  padding: var(--fj-space-4);
+  font-size: var(--fj-font-size-body);
+  font-family: var(--fj-font-family);
+  color: var(--fj-color-text-body);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.1s ease, box-shadow 0.1s ease;
+}
+
+.fj-textarea:focus {
+  border-color: var(--fj-color-primary-400);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+/* Chip / badge (f.eks. "Total score 72/100") */
+.fj-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--fj-space-3);
+  height: 32px;
+  border-radius: var(--fj-radius-pill);
+  font-size: var(--fj-font-size-small);
+  font-weight: 600;
+}
+
+/* Eksempel-varianter */
+.fj-badge-score {
+  background: var(--fj-color-primary-100);
+  color: var(--fj-color-text-strong);
+}
+
+.fj-badge-success {
+  background: var(--fj-color-success-soft);
+  color: var(--fj-color-success);
+}
+
+.fj-badge-warning {
+  background: var(--fj-color-warning-soft);
+  color: var(--fj-color-warning);
+}
+
+.fj-badge-danger {
+  background: var(--fj-color-danger-soft);
+  color: var(--fj-color-danger);
+}
+
+/* Små label-tekster over inputs */
+.fj-label {
+  display: inline-block;
+  margin-bottom: var(--fj-space-2);
+  font-size: var(--fj-font-size-small);
+  color: var(--fj-color-text-strong);
+}
+
+/* Divider-linje (f.eks. mellom header og innhold) */
+.fj-divider {
+  height: 1px;
+  background: var(--fj-color-border-subtle);
+  margin: var(--fj-space-4) 0;
+}

@@ -1,4 +1,5 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 
 type AuthMode = "login" | "register";
 
@@ -19,14 +20,33 @@ type AuthPageProps = {
 };
 
 function AuthPage({ onAuthSuccess }: AuthPageProps) {
-  const [mode, setMode] = useState<AuthMode>("register");
+  const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [stayLogged, setStayLogged] = useState(true);
   const [status, setStatus] = useState<string>("");
+  const [statusType, setStatusType] = useState<"idle" | "success" | "error" | "info">("idle");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const qp = searchParams.get("mode");
+    if (qp === "login" || qp === "register") {
+      setMode(qp);
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
+    if (mode === "register" && password !== confirmPassword) {
+      setStatus("Passordene matcher ikke.");
+      setStatusType("error");
+      return;
+    }
+
     setStatus("Sender...");
+    setStatusType("info");
 
     try {
       const res = await fetch(`${API_URL}/api/${mode}`, {
@@ -38,6 +58,7 @@ function AuthPage({ onAuthSuccess }: AuthPageProps) {
       if (!res.ok) {
         const error = (await res.json()) as ErrorResponse;
         setStatus(error.message ?? "Noe gikk galt.");
+        setStatusType("error");
         return;
       }
 
@@ -49,57 +70,109 @@ function AuthPage({ onAuthSuccess }: AuthPageProps) {
           data.email
         }. Token er lagret i nettleseren.`
       );
+      setStatusType("success");
     } catch (err) {
       setStatus("Klarte ikke å kontakte serveren.");
+      setStatusType("error");
     }
   }
 
   return (
-    <section className="page">
-      <h1>Logg inn / Registrer</h1>
-      <div className="auth-toggle">
+    <div className="auth-page">
+      <div className="auth-switch-top">
         <button
-          className={mode === "register" ? "active" : ""}
-          onClick={() => setMode("register")}
           type="button"
+          className="auth-pill-switch"
+          onClick={() => {
+            const next = mode === "login" ? "register" : "login";
+            setMode(next);
+            setSearchParams({ mode: next });
+          }}
         >
-          Registrer
-        </button>
-        <button
-          className={mode === "login" ? "active" : ""}
-          onClick={() => setMode("login")}
-          type="button"
-        >
-          Logg inn
+          {mode === "login" ? "Registrer deg" : "Logg inn"}
         </button>
       </div>
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <label>
-          E-post
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Passord
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            minLength={8}
-            required
-          />
-        </label>
-        <button type="submit">
-          {mode === "register" ? "Registrer" : "Logg inn"}
-        </button>
-      </form>
 
-      {status && <p className="status">{status}</p>}
-    </section>
+      <section className="auth-card">
+        <h1>{mode === "login" ? "Logg inn" : "Registrer deg"}</h1>
+        <form className="auth-form auth-form-styled" onSubmit={handleSubmit}>
+          <div className="auth-field">
+            <label htmlFor="auth-email">E-postadresse</label>
+            <input
+              id="auth-email"
+              className="auth-input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="navn@firma.no"
+            />
+          </div>
+
+          <div className="auth-field">
+            <label htmlFor="auth-password">Passord</label>
+            <input
+              id="auth-password"
+              className="auth-input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              minLength={8}
+              required
+              placeholder="••••••••"
+            />
+          </div>
+
+          {mode === "register" && (
+            <div className="auth-field">
+              <label htmlFor="auth-password-confirm">Bekreft passord</label>
+              <input
+                id="auth-password-confirm"
+                className="auth-input"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                minLength={8}
+                required
+                placeholder="••••••••"
+              />
+            </div>
+          )}
+
+          <label className="auth-remember">
+            <input
+              type="checkbox"
+              checked={stayLogged}
+              onChange={(e) => setStayLogged(e.target.checked)}
+            />
+            <span>Forbli innlogget</span>
+          </label>
+
+          <button className="auth-submit" type="submit">
+            {mode === "register" ? "Registrer deg" : "Logg inn"}
+          </button>
+        </form>
+
+        <p className="auth-switch-text">
+          {mode === "login" ? "Har du ikke konto?" : "Har du allerede konto?"}{" "}
+          <button
+            type="button"
+            className="auth-text-link"
+            onClick={() => {
+              const next = mode === "login" ? "register" : "login";
+              setMode(next);
+              setSearchParams({ mode: next });
+            }}
+          >
+            {mode === "login" ? "Registrer deg" : "Logg inn"}
+          </button>
+        </p>
+
+        {status && (
+          <div className={`status-banner status-${statusType}`}>{status}</div>
+        )}
+      </section>
+    </div>
   );
 }
 

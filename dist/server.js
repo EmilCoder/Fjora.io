@@ -150,9 +150,28 @@ app.put("/api/me", async (request, reply) => {
     return reply.send({ id: updated.id, email: updated.email, updatedAt: updated.updatedAt });
 });
 app.post("/api/ideas", async (request, reply) => {
-    const user = await requireUser(request, reply);
-    if (!user) {
-        return;
+    // Optional auth: if a valid bearer token is present, we attach the user.
+    // If not, we still allow ad-hoc analysis without persisting to DB.
+    let user;
+    const auth = request.headers.authorization;
+    if (auth?.startsWith("Bearer ")) {
+        const token = auth.slice("Bearer ".length);
+        try {
+            const decoded = jwt.verify(token, jwtSecretValue);
+            if (decoded &&
+                typeof decoded === "object" &&
+                "id" in decoded &&
+                "email" in decoded) {
+                user = {
+                    id: decoded.id,
+                    email: decoded.email,
+                };
+            }
+        }
+        catch (err) {
+            request.log.warn({ err }, "Ugyldig token i ideas-request");
+            return reply.code(401).send({ message: "Ugyldig token." });
+        }
     }
     const { title, content } = request.body;
     if (!title || !content) {
@@ -160,19 +179,28 @@ app.post("/api/ideas", async (request, reply) => {
             .code(400)
             .send({ message: "title og content må fylles ut." });
     }
-    const userExists = await prisma.user.findUnique({ where: { id: user.id } });
-    if (!userExists) {
-        return reply.code(404).send({ message: "Fant ikke bruker." });
-    }
     const analysis = simulateAiAnalysis(title, content);
-    const idea = await prisma.idea.create({
-        data: { userId: user.id, title, content, aiReply: JSON.stringify(analysis) },
-    });
-    return reply.code(201).send({
-        id: idea.id,
-        title: idea.title,
-        content: idea.content,
+    // If authenticated, persist; if not, just return analysis.
+    if (user) {
+        const userExists = await prisma.user.findUnique({ where: { id: user.id } });
+        if (!userExists) {
+            return reply.code(404).send({ message: "Fant ikke bruker." });
+        }
+        const idea = await prisma.idea.create({
+            data: { userId: user.id, title, content, aiReply: JSON.stringify(analysis) },
+        });
+        return reply.code(201).send({
+            id: idea.id,
+            title: idea.title,
+            content: idea.content,
+            analysis,
+        });
+    }
+    return reply.code(200).send({
+        title,
+        content,
         analysis,
+        note: "Ikke lagret (ingen innlogging).",
     });
 });
 app.get("/api/ideas", async (request, reply) => {

@@ -5,6 +5,7 @@ import IdeaSubmissionPage from "./pages/IdeaSubmissionPage";
 import InsightsPage from "./pages/InsightsPage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
+import logo from "./fjora_logo.png";
 
 function App() {
   const [token, setToken] = useState<string | null>(
@@ -27,15 +28,22 @@ function App() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <div className="brand">iFjora</div>
-        <nav>
-          <Link to="/">Landingsside</Link>
-          <Link to="/ideas">Ideinnsending</Link>
-          <Link to="/insights">Innsikt</Link>
-          {!token && <Link to="/auth">Logg inn / Registrer</Link>}
-          {token && <Link to="/profile">Min side</Link>}
+        <Link to="/" className="brand brand-logo" aria-label="Gå til forsiden">
+          <img src={logo} alt="Fjora logo" />
+        </Link>
+        <nav className="header-actions">
+          {!token && (
+            <>
+              <Link className="header-btn outline" to="/auth?mode=login">
+                Logg inn
+              </Link>
+              <Link className="header-btn solid" to="/auth?mode=register">
+                Registrer deg
+              </Link>
+            </>
+          )}
           {token && (
-            <button className="ghost" type="button" onClick={handleLogout}>
+            <button className="header-btn outline" type="button" onClick={handleLogout}>
               Logg ut
             </button>
           )}
