@@ -110,7 +110,7 @@ function InsightsPage() {
   if (!activeInsight) {
     return (
       <div className="insights-page">
-        <div className="insights-shell">
+        <div className="insights-shell insights-empty-shell">
           <section className="insights-hero">
             <div className="insights-hero-text">
               <p className="eyebrow">Innsikt</p>
@@ -122,7 +122,7 @@ function InsightsPage() {
           <div className="insights-actions">
             <button
               type="button"
-              className="insights-btn solid"
+              className="insights-btn empty-cta"
               onClick={() => navigate("/ideas")}
             >
               Send inn første idé
@@ -440,13 +440,6 @@ function InsightsPage() {
                 onClick={() => navigate("/ideas")}
               >
                 Prøv ny idé
-              </button>
-              <button
-                type="button"
-                className="insights-btn solid"
-                onClick={() => navigate("/auth")}
-              >
-                Lagre resultatet
               </button>
             </div>
           </div>
