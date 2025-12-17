@@ -76,6 +76,11 @@ async function callAiService(payload) {
         return simulateAiAnalysis(payload.title, payload.content);
     }
 }
+function round2(value) {
+    if (value === null || value === undefined)
+        return undefined;
+    return Math.round(value * 100) / 100;
+}
 function issueToken(payload) {
     return jwt.sign(payload, jwtSecretValue, { expiresIn: "7d" });
 }
@@ -249,6 +254,13 @@ app.post("/api/ideas", async (request, reply) => {
         fundingRounds,
         team,
     });
+    const roundedAnalysis = {
+        ...analysis,
+        score: round2(analysis.score) ?? 0,
+        dataScore: round2(analysis.dataScore),
+        ideaScore: round2(analysis.ideaScore),
+        combinedScore: round2(analysis.combinedScore ?? analysis.score),
+    };
     // If authenticated, persist; if not, just return analysis.
     if (user) {
         const userExists = await prisma.user.findUnique({ where: { id: user.id } });
@@ -268,7 +280,7 @@ app.post("/api/ideas", async (request, reply) => {
                 fundingTotal: fundingTotal ?? null,
                 fundingRounds: fundingRounds ?? null,
                 // team beskrivelse lagres ikke i egen kolonne; kun med i AI-kallet
-                aiReply: JSON.stringify(analysis),
+                aiReply: JSON.stringify(roundedAnalysis),
             },
         });
         const created = idea;
@@ -283,13 +295,13 @@ app.post("/api/ideas", async (request, reply) => {
             city: created.city ?? null,
             fundingTotal: created.fundingTotal ?? null,
             fundingRounds: created.fundingRounds ?? null,
-            analysis,
+            analysis: roundedAnalysis,
         });
     }
     return reply.code(200).send({
         title,
         content,
-        analysis,
+        analysis: roundedAnalysis,
         note: "Ikke lagret (ingen innlogging).",
     });
 });
